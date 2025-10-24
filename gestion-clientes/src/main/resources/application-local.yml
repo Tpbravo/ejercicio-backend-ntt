@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/gestion_clientes_db
+    username: ms_clientes
+    password: ms_clientes_pwd
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 60000
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # crea/actualiza las tablas según tus entidades
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: core
+        format_sql: true
+        jdbc:
+          time_zone: America/Guayaquil
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace  # muestra parámetros SQL

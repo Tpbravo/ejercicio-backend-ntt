@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_bank
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: America/Guayaquil
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/BaseDatos.sql:/docker-entrypoint-initdb.d/BaseDatos.sql
+    networks:
+      - bank_net
+
+networks:
+  bank_net:
+    driver: bridge
