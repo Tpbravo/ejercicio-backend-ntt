@@ -12,11 +12,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cliente", schema = "core")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @PrimaryKeyJoinColumn(name = "id")
@@ -33,7 +35,7 @@ public class Cliente extends Persona {
 
 	@NotNull(message = "{estado.notnull}")
 	@Column(nullable = false)
-	private Boolean estado;
+	private boolean estado;
 
 	@Column(name = "fecha_creacion", nullable = false, updatable = false)
 	private LocalDateTime fechaCreacion;

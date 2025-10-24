@@ -16,19 +16,27 @@ import com.banco.gestionclientes.api.dto.ClienteDTO;
 import com.banco.gestionclientes.domain.model.Cliente;
 import com.banco.gestionclientes.domain.service.ClienteService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
+
 	private final ClienteService clienteService;
 
 	@PostMapping
-	public ResponseEntity<ClienteDTO> guardar(@RequestBody ClienteDTO dto) {
+	public ResponseEntity<ClienteDTO> guardar(@Valid @RequestBody ClienteDTO dto) { 
 		Cliente cliente = toEntity(dto);
 		Cliente saved = clienteService.guardar(cliente);
 		return ResponseEntity.ok(toDTO(saved));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<ClienteDTO> actualizar(@PathVariable Long id, @Valid @RequestBody ClienteDTO dto) { 
+		Cliente actualizado = clienteService.actualizar(id, toEntity(dto));
+		return ResponseEntity.ok(toDTO(actualizado));
 	}
 
 	@GetMapping
@@ -41,12 +49,6 @@ public class ClienteController {
 	public ResponseEntity<ClienteDTO> obtenerPorId(@PathVariable Long id) {
 		return clienteService.buscarPorId(id).map(cliente -> ResponseEntity.ok(toDTO(cliente)))
 				.orElse(ResponseEntity.notFound().build());
-	}
-
-	@PutMapping("/{id}")
-	public ResponseEntity<ClienteDTO> actualizar(@PathVariable Long id, @RequestBody ClienteDTO dto) {
-		Cliente actualizado = clienteService.actualizar(id, toEntity(dto));
-		return ResponseEntity.ok(toDTO(actualizado));
 	}
 
 	@DeleteMapping("/{id}")
@@ -79,8 +81,7 @@ public class ClienteController {
 		dto.setDireccion(cliente.getDireccion());
 		dto.setTelefono(cliente.getTelefono());
 		dto.setClienteId(cliente.getClienteId());
-		dto.setContrasena(cliente.getContrasena());
-		dto.setEstado(cliente.getEstado());
+		dto.setEstado(cliente.isEstado());
 		return dto;
 	}
 }

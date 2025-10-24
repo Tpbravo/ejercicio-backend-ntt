@@ -1,95 +1,45 @@
 package com.banco.gestionclientes.api.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Data
 public class ClienteDTO {
-	private Long id;
-	private String nombre;
-	private String genero;
-	private Integer edad;
-	private String identificacion;
-	private String direccion;
-	private String telefono;
-	private String clienteId;
-	private String contrasena;
-	private Boolean estado;
 
-	public Long getId() {
-		return id;
-	}
+    private Long id;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @NotBlank(message = "{nombre.notblank}")
+    @Size(max = 100, message = "{nombre.size}")
+    private String nombre;
 
-	public String getNombre() {
-		return nombre;
-	}
+    @NotBlank(message = "{genero.notblank}")
+    @Size(max = 50, message = "{genero.size}")
+    private String genero;
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    @NotNull(message = "{edad.notnull}")
+    @Min(value = 0, message = "{edad.min}")
+    private Integer edad;
 
-	public String getGenero() {
-		return genero;
-	}
+    @NotBlank(message = "{identificacion.notblank}")
+    @Size(max = 20, message = "{identificacion.size}")
+    private String identificacion;
 
-	public void setGenero(String genero) {
-		this.genero = genero;
-	}
+    @Size(max = 150, message = "{direccion.size}")
+    private String direccion;
 
-	public Integer getEdad() {
-		return edad;
-	}
+    @Size(max = 20, message = "{telefono.size}")
+    private String telefono;
 
-	public void setEdad(Integer edad) {
-		this.edad = edad;
-	}
+    @Size(max = 20, message = "{clienteId.size}")
+    private String clienteId;
 
-	public String getIdentificacion() {
-		return identificacion;
-	}
+    @NotBlank(message = "{contrasena.notblank}")
+    @Size(min = 6, message = "{contrasena.size}")
+    private String contrasena;
 
-	public void setIdentificacion(String identificacion) {
-		this.identificacion = identificacion;
-	}
-
-	public String getDireccion() {
-		return direccion;
-	}
-
-	public void setDireccion(String direccion) {
-		this.direccion = direccion;
-	}
-
-	public String getTelefono() {
-		return telefono;
-	}
-
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
-	}
-
-	public String getClienteId() {
-		return clienteId;
-	}
-
-	public void setClienteId(String clienteId) {
-		this.clienteId = clienteId;
-	}
-
-	public String getContrasena() {
-		return contrasena;
-	}
-
-	public void setContrasena(String contrasena) {
-		this.contrasena = contrasena;
-	}
-
-	public Boolean getEstado() {
-		return estado;
-	}
-
-	public void setEstado(Boolean estado) {
-		this.estado = estado;
-	}
-
+    @NotNull(message = "{estado.notnull}")
+    private Boolean estado;
 }
