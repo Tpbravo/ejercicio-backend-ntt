@@ -31,10 +31,11 @@ public class MessageConfig extends AcceptHeaderLocaleResolver {
 		return this; // Usa el encabezado Accept-Language del request
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Locale resolveLocale(jakarta.servlet.http.HttpServletRequest request) {
 		String headerLang = request.getHeader("Accept-Language");
-		return (headerLang == null || headerLang.isBlank()) ? Locale.of("es") : Locale.forLanguageTag(headerLang);
+		return (headerLang == null || headerLang.isEmpty()) ? new Locale("es") : Locale.forLanguageTag(headerLang);
 	}
 
 	@Bean

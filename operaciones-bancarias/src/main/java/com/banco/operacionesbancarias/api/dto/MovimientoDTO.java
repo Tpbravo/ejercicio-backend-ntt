@@ -3,6 +3,8 @@ package com.banco.operacionesbancarias.api.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.banco.operacionesbancarias.domain.model.enums.TipoMovimientoEnum;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -11,18 +13,15 @@ public class MovimientoDTO {
 
 	private Long id;
 
-	@NotNull(message = "{cuentaId.notnull}")
-	private Long cuentaId;
-
 	private LocalDateTime fecha;
 
-	@NotBlank(message = "{tipoMovimiento.notblank}")
-	@Size(max = 20, message = "{tipoMovimiento.size}")
-	private String tipoMovimiento; // "Depósito" o "Retiro"
+	@NotBlank(message = "El número de cuenta es obligatorio")
+	private String numeroCuenta;
 
-	@NotNull(message = "{valor.notnull}")
-	@Digits(integer = 12, fraction = 2, message = "{valor.digits}")
+    @NotNull(message = "El tipo de movimiento es obligatorio")
+	private TipoMovimientoEnum tipoMovimiento;
+
+	@NotNull(message = "El valor es obligatorio")
+	@Digits(integer = 12, fraction = 2, message = "Formato de valor inválido")
 	private BigDecimal valor;
-
-	private BigDecimal saldoDisponible;
 }

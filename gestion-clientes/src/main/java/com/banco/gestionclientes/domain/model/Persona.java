@@ -1,7 +1,11 @@
 package com.banco.gestionclientes.domain.model;
 
+import com.banco.gestionclientes.domain.model.enums.Genero;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,10 +37,10 @@ public class Persona {
 	@Column(nullable = false, length = 100)
 	private String nombre;
 
-	@NotBlank(message = "{genero.notblank}")
-	@Size(max = 50, message = "{genero.size}")
+	@NotNull(message = "{genero.notnull}")
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 50)
-	private String genero;
+	private Genero genero;
 
 	@NotNull(message = "{edad.notnull}")
 	@Min(value = 0, message = "{edad.min}")

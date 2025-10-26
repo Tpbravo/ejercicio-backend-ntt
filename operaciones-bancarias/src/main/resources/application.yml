@@ -1,24 +1,36 @@
 spring:
   application:
     name: operaciones-bancarias
+
   profiles:
     active: local
+
   datasource:
     url: jdbc:postgresql://localhost:5433/operaciones_bancarias_db
     username: ms_operaciones
     password: ms_operaciones_pwd
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  messages:
-    basename: ValidationMessages
-    encoding: UTF-8
+        format_sql: true
+
+# Configuración del microservicio gestion-clientes
+services:
+  gestion-clientes:
+    url: http://localhost:8081/api/gestion-clientes/clientes
 
 server:
   port: 8082
   servlet:
-    context-path: /api
+    context-path: /api/operaciones
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

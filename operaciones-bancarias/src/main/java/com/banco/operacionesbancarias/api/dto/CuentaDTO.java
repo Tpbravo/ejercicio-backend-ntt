@@ -3,6 +3,10 @@ package com.banco.operacionesbancarias.api.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.banco.operacionesbancarias.api.validation.ValidationGroups.OnCreate;
+import com.banco.operacionesbancarias.api.validation.ValidationGroups.OnUpdate;
+import com.banco.operacionesbancarias.domain.model.enums.TipoCuentaEnum;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -11,26 +15,23 @@ public class CuentaDTO {
 
 	private Long id;
 
-	@NotBlank(message = "{numeroCuenta.notblank}")
+	@NotBlank(message = "{numeroCuenta.notblank}", groups = OnCreate.class)
 	@Size(max = 20, message = "{numeroCuenta.size}")
 	private String numeroCuenta;
 
-	@NotBlank(message = "{tipoCuenta.notblank}")
-	@Size(max = 20, message = "{tipoCuenta.size}")
-	private String tipoCuenta;
+	@NotNull(message = "{tipoCuenta.notnull}", groups = { OnCreate.class, OnUpdate.class })
+	private TipoCuentaEnum tipoCuenta;
 
-	@NotNull(message = "{saldoInicial.notnull}")
-	@PositiveOrZero(message = "{saldoInicial.positiveOrZero}")
+	@NotNull(message = "{saldoInicial.notnull}", groups = { OnCreate.class })
+	@PositiveOrZero(message = "{saldoInicial.positiveOrZero}", groups = { OnCreate.class, OnUpdate.class })
 	private BigDecimal saldoInicial;
 
-	@NotNull(message = "{estado.notnull}")
+	@NotNull(message = "{estado.notnull}", groups = { OnCreate.class, OnUpdate.class })
 	private Boolean estado;
 
-	@NotBlank(message = "{clienteId.notblank}")
-	@Size(max = 20, message = "{clienteId.size}")
+	@NotNull(message = "{clienteId.notnull}", groups = OnCreate.class)
 	private String clienteId;
 
-	@NotBlank(message = "{clienteNombre.notblank}")
 	@Size(max = 100, message = "{clienteNombre.size}")
 	private String clienteNombre;
 

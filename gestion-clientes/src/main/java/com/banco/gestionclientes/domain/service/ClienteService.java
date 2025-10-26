@@ -15,4 +15,8 @@ public interface ClienteService {
 	Cliente actualizar(Long id, Cliente cliente);
 
 	void eliminar(Long id);
+
+	Optional<Cliente> buscarPorClienteId(String clienteId);
+
+	Cliente buscarPorIdOrThrow(Long id);
 }

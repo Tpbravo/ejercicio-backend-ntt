@@ -17,4 +17,12 @@ public interface CuentaService {
 	Cuenta actualizar(Long id, Cuenta cuenta);
 
 	void eliminar(Long id);
+
+	void inactivarCuentasDeCliente(String clienteId);
+
+	void activarCuentasDeCliente(String clienteId);
+
+	void eliminarCuentasDeCliente(String clienteId);
+	
+	
 }

@@ -14,7 +14,7 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 public class MessageConfig extends AcceptHeaderLocaleResolver {
 
 	@Bean
-	public MessageSource messageSource() {
+	MessageSource messageSource() {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasename("classpath:ValidationMessages");
 		messageSource.setDefaultEncoding("UTF-8");
@@ -23,10 +23,11 @@ public class MessageConfig extends AcceptHeaderLocaleResolver {
 	}
 
 	@Bean
-	public LocaleResolver localeResolver() {
+	LocaleResolver localeResolver() {
 		return this; // Usa el Accept-Language del request
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Locale resolveLocale(jakarta.servlet.http.HttpServletRequest request) {
 		String headerLang = request.getHeader("Accept-Language");
@@ -34,7 +35,7 @@ public class MessageConfig extends AcceptHeaderLocaleResolver {
 	}
 
 	@Bean
-	public LocalValidatorFactoryBean defaultValidator(MessageSource messageSource) {
+	LocalValidatorFactoryBean defaultValidator(MessageSource messageSource) {
 		LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
 		bean.setValidationMessageSource(messageSource);
 		return bean;

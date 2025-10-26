@@ -33,9 +33,12 @@ public class Cliente extends Persona {
 	@Column(nullable = false, length = 100)
 	private String contrasena;
 
+	@Column(name = "contrasena_anterior")
+	private String contrasenaAnterior;
+
 	@NotNull(message = "{estado.notnull}")
 	@Column(nullable = false)
-	private boolean estado;
+	private Boolean estado;
 
 	@Column(name = "fecha_creacion", nullable = false, updatable = false)
 	private LocalDateTime fechaCreacion;
