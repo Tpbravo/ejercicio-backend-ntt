@@ -60,6 +60,16 @@ services:
       - kafka
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    deploy:
+      resources:
+        limits:
+          cpus: "6.0"   # puede usar hasta 6 núcleos
+          memory: 8g    # hasta 8 GB de RAM
+        reservations:
+          cpus: "2.0"   # garantiza al menos 2 núcleos
+          memory: 2g
+    cpus: 6
+    mem_limit: 8g
     networks:
       - bank_net
 
@@ -77,11 +87,21 @@ services:
       - gestion-clientes
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_bank:29092   #  entre comillas opcional pero recomendado
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_bank:29092
+    deploy:
+      resources:
+        limits:
+          cpus: "8.0"   # puede usar hasta 8 núcleos
+          memory: 12g   # hasta 12 GB de RAM
+        reservations:
+          cpus: "3.0"   # garantiza al menos 3 núcleos
+          memory: 3g
+    cpus: 8
+    mem_limit: 12g
     networks:
       - bank_net
 
 networks:
   bank_net:
-    name: bank_net   
+    name: bank_net
     driver: bridge

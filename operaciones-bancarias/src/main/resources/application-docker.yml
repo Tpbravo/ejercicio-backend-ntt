@@ -28,7 +28,7 @@ spring:
 
 services:
   gestion-clientes:
-    url: http://gestion-clientes:8081/api/clientes
+    url: http://gestion-clientes:8081/api/gestion-clientes/clientes
 
 server:
   port: 8082

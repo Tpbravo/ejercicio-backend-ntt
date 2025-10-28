@@ -54,7 +54,6 @@ public class ClienteController {
 	public ResponseEntity<ApiResponse<List<ClienteDTO>>> listar() {
 		List<ClienteDTO> lista = clienteService.listar().stream().map(ClienteMapper::toDTO)
 				.collect(Collectors.toList());
-
 		return ResponseEntity.ok(ApiResponse.ok(lista, "Listado de clientes obtenido correctamente"));
 	}
 
@@ -66,10 +65,12 @@ public class ClienteController {
 	}
 
 	@GetMapping("/codigo/{clienteId}")
-	public ResponseEntity<ClienteDTO> obtenerPorClienteId(@PathVariable String clienteId) {
-		return clienteService.buscarPorClienteId(clienteId)
-				.map(cliente -> ResponseEntity.ok(ClienteMapper.toDTO(cliente)))
-				.orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<ApiResponse<ClienteDTO>> obtenerPorClienteId(@PathVariable String clienteId) {
+		return clienteService.buscarPorClienteId(clienteId).map(cliente -> {
+			ClienteDTO dto = ClienteMapper.toDTO(cliente);
+			return ResponseEntity.ok(ApiResponse.ok(dto, "Cliente obtenido correctamente por clienteId"));
+		}).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(ApiResponse.error("Cliente no encontrado con clienteId: " + clienteId)));
 	}
 
 	@DeleteMapping("/{id}")

@@ -2,7 +2,6 @@ package com.banco.operacionesbancarias.api.controller;
 
 import com.banco.operacionesbancarias.api.dto.MovimientoResponseDTO;
 import com.banco.operacionesbancarias.api.dto.ReporteDTO;
-import com.banco.operacionesbancarias.api.response.ApiResponse;
 import com.banco.operacionesbancarias.domain.model.enums.TipoCuentaEnum;
 import com.banco.operacionesbancarias.domain.model.enums.TipoMovimientoEnum;
 import com.banco.operacionesbancarias.domain.service.ReporteService;

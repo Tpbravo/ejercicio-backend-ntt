@@ -24,10 +24,10 @@ class ClienteRestIntegrationTest {
 		configureFor("localhost", 9561);
 
 		// Creamos el WebClient apuntando al servidor simulado
-//		WebClient webClient = WebClient.builder().baseUrl("http://localhost:9561/clientes").build();
+		WebClient webClient = WebClient.builder().baseUrl("http://localhost:9561/clientes").build();
 
 		// Instanciamos el cliente REST manualmente
-//		clienteServiceClient = new ClienteServiceClient(webClient);
+		clienteServiceClient = new ClienteServiceClient(webClient);
 	}
 
 	@AfterAll
@@ -42,9 +42,7 @@ class ClienteRestIntegrationTest {
 		wireMockServer.resetAll();
 	}
 
-	// -------------------------------------------------------------
 	// Caso 1: Cliente encontrado (HTTP 200)
-	// -------------------------------------------------------------
 	@Test
 	@DisplayName("Debería retornar ClienteDTO cuando el servicio remoto responde 200 OK")
 	void obtenerClientePorClienteId_exitoso() {
@@ -74,9 +72,7 @@ class ClienteRestIntegrationTest {
 		assertThat(cliente.getEstado()).isTrue();
 	}
 
-	// -------------------------------------------------------------
 	// Caso 2: Cliente no encontrado (HTTP 404)
-	// -------------------------------------------------------------
 	@Test
 	@DisplayName("Debería lanzar excepción cuando el cliente no existe (404)")
 	void obtenerClientePorClienteId_noEncontrado() {
@@ -88,9 +84,7 @@ class ClienteRestIntegrationTest {
 				.isInstanceOf(RuntimeException.class).hasMessageContaining("Cliente no encontrado");
 	}
 
-	// -------------------------------------------------------------
 	// Caso 3: Error del servidor remoto (HTTP 500)
-	// -------------------------------------------------------------
 	@Test
 	@DisplayName("Debería lanzar excepción cuando el servicio remoto responde 500")
 	void obtenerClientePorClienteId_errorServidor() {

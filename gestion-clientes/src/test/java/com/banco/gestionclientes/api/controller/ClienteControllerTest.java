@@ -1,7 +1,6 @@
 package com.banco.gestionclientes.api.controller;
 
 import com.banco.gestionclientes.api.dto.ClienteDTO;
-import com.banco.gestionclientes.api.response.ApiResponse;
 import com.banco.gestionclientes.domain.model.Cliente;
 import com.banco.gestionclientes.domain.model.enums.Genero;
 import com.banco.gestionclientes.domain.service.ClienteService;
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
