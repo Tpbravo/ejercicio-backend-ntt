@@ -1,5 +1,6 @@
 package com.banco.operacionesbancarias.infrastructure.client;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,7 +12,7 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class ClienteServiceClient {
-
+	@Qualifier("webClient")
 	private final WebClient webClient;
 
 	public Mono<ClienteDTO> obtenerClientePorClienteId(String clienteId) {

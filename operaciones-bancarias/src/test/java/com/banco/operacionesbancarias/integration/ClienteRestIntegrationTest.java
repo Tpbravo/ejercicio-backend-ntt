@@ -24,10 +24,10 @@ class ClienteRestIntegrationTest {
 		configureFor("localhost", 9561);
 
 		// Creamos el WebClient apuntando al servidor simulado
-		WebClient webClient = WebClient.builder().baseUrl("http://localhost:9561/clientes").build();
+//		WebClient webClient = WebClient.builder().baseUrl("http://localhost:9561/clientes").build();
 
 		// Instanciamos el cliente REST manualmente
-		clienteServiceClient = new ClienteServiceClient(webClient);
+//		clienteServiceClient = new ClienteServiceClient(webClient);
 	}
 
 	@AfterAll

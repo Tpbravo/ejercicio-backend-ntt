@@ -77,7 +77,7 @@ services:
       - gestion-clientes
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_bank:29092   # 👈 entre comillas opcional pero recomendado
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka_bank:29092   #  entre comillas opcional pero recomendado
     networks:
       - bank_net
 
