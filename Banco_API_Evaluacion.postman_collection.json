@@ -1,0 +1,607 @@
+{
+	"info": {
+		"_postman_id": "c36d38bb-3751-4733-9d08-12e24298fbfb",
+		"name": "Banco_API_Evaluacion",
+		"description": "Colección diseñada para probar el flujo completo de microservicios **Gestión de Clientes** y **Operaciones Bancarias**.\n\n## Flujo recomendado\n\nCrear Cliente → guarda `clienteId`  \nCrear Cuenta → usa `clienteId`  \nRegistrar Movimiento → usa `numeroCuenta`  \nEstado de Cuenta → consulta por `clienteId`\n\n## Environments\n\n**Local**\n\n- `host_clientes=http://localhost:8081`\n    \n- `host_operaciones=http://localhost:8082`\n    \n\n**Docker**\n\n- `host_clientes=http://gestion-clientes:8081`\n    \n- `host_operaciones=http://operaciones-bancarias:8082`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49548372",
+		"_collection_link": "https://paulbtrabajo10-2799578.postman.co/workspace/980ed9f2-5fdf-4206-9393-728bf5cd4d6c/collection/49548372-c36d38bb-3751-4733-9d08-12e24298fbfb?action=share&source=collection_link&creator=49548372"
+	},
+	"item": [
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Crear Cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 201/200\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"const json = pm.response.json() || {};",
+									"const id = json.data?.id || json.id;                    ",
+									"const clienteId = json.data?.clienteId || json.clienteId;",
+									"",
+									"pm.test(\"La respuesta contiene id y clienteId\", function () {",
+									"  pm.expect(id).to.exist;",
+									"  pm.expect(clienteId).to.exist;",
+									"});",
+									"",
+									"// Guardar ambos valores en environment",
+									"pm.environment.set(\"id\", id);",
+									"pm.environment.set(\"clienteId\", clienteId);",
+									"",
+									"console.log(\"id guardado:\", id);",
+									"console.log(\"clienteId guardado:\", clienteId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234564491\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"Abc123@12\",\n  \"estado\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_clientes}}/clientes",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes"
+							]
+						},
+						"description": "rear Cliente\n\n### Descripción\n\nCrea un nuevo cliente en el sistema, registrando su información personal y de contacto.  \nDurante el proceso, el sistema genera automáticamente un identificador público (`clienteId`) y cifra la contraseña antes de guardar el registro en la base de datos.\n\n### Notas\n\n- El cuerpo de la solicitud debe cumplir las validaciones definidas en el DTO `ClienteDTO`.\n    \n- El campo `clienteId` es opcional; si no se envía, el sistema lo genera automáticamente mediante el método `generarClienteId()`.\n    \n- La contraseña enviada se cifra utilizando `passwordEncoder` antes de almacenarse.\n    \n- Si alguno de los campos requeridos no cumple las reglas de validación, el sistema devuelve un error **400 Bad Request** con el detalle de los campos inválidos.\n    \n- Una vez creado, el cliente queda en estado activo (`estado: true`) a menos que se especifique lo contrario.\n    \n\n### Campos Requeridos\n\n- `nombre` (String)\n    \n- `genero` (String)\n    \n- `edad` (Integer)\n    \n- `identificacion` (String)\n    \n- `contrasena` (String)\n    \n- `estado` (Boolean)\n    \n\n### Campos Opcionales\n\n- `direccion` (String)\n    \n- `telefono` (String)\n    \n- `clienteId` (String)\n    \n\n### Endpoint\n\n`POST {{host_clientes}}/api/gestion-clientes/clientes`\n\nEjemplo Body:\n\n``` json\n{\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"Abc123@\",\n  \"estado\": true\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Clientes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/clientes",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes"
+							]
+						},
+						"description": "## Descripción\n\nRetorna la lista completa de clientes registrados."
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes",
+								"{{id}}"
+							]
+						},
+						"description": "## **Descripción**  \nObtiene la información detallada de un cliente específico mediante su identificador único (`id`).\n\n### **Notas**\n\n- Este endpoint devuelve los datos completos del cliente previamente registrado.\n    \n- El parámetro `{{id}}` se obtiene al crear un cliente (almacenado en el environment de Postman).\n    \n- Es útil para validar que los datos fueron guardados correctamente o para consultas individuales.\n    \n\n### **Endpoint**\n\n`GET {{host_clientes}}/api/gestion-clientes/clientes/{{id}}`\n\n### 🧾 **Ejemplo URL**\n\n```\nhttp://localhost:8081/api/gestion-clientes/clientes/1\n\n ```\n\n### 📤 **Ejemplo Respuesta**\n\n```\n{\n  \"id\": 1,\n  \"clienteId\": \"C0001\",\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"estado\": true\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar cliente",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"nombre\": \"Jose Leman\",\n    \"genero\": \"Masculino\",\n    \"edad\": 30,\n    \"identificacion\": \"1234564490\",\n    \"direccion\": \"Quito sn y principal\",\n    \"telefono\": \"098254785\",\n    \"contrasena\": null,\n    \"estado\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_clientes}}/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes",
+								"{{id}}"
+							]
+						},
+						"description": "### Descripción\n\nActualiza la información de un cliente existente según su `id`.  \nSolo se modifican los campos enviados en el cuerpo de la solicitud; los campos no incluidos permanecen sin cambios.  \nTambién se controlan cambios de contraseña y activación/inactivación del cliente con envío de eventos Kafka.\n\n### Notas\n\n- Si el cliente no existe, se devuelve un error **404**.\n    \n- No se puede reutilizar la misma contraseña actual ni la anterior.\n    \n- Si el estado cambia:\n    \n    - De **activo → inactivo**, se publica un evento `CLIENTE_DESACTIVADO` (para desactivar cuentas asociadas).\n        \n    - De **inactivo → activo**, se publica un evento `CLIENTE_ACTIVADO`.\n        \n- Solo se permiten actualizaciones parciales (los valores nulos o vacíos no se aplican).\n    \n\n### Endpoint\n\n`PUT {{host_clientes}}/api/gestion-clientes/clientes/{{id}}`\n\n### Campos Actualizables\n\n- `nombre` (String)\n    \n- `genero` (String)\n    \n- `edad` (Integer)\n    \n- `identificacion` (String)\n    \n- `direccion` (String)\n    \n- `telefono` (String)\n    \n- `contrasena` (String)\n    \n- `estado` (Boolean)\n    \n\n### **Endpoint**\n\n`PUT {{host_clientes}}/api/gestion-clientes/clientes/{{id}}`\n\n### **Ejemplo Body**\n\n```\n{\n  \"nombre\": \"Jose Lema Modificado\",\n  \"edad\": 31,\n  \"direccion\": \"Quito Av. Central y Bolívar\",\n  \"telefono\": \"099998877\",\n  \"contrasena\": \"NewPass@2025\",\n  \"estado\": false\n}\n\n ```\n\n### **Ejemplo Respuesta**\n\n```\n{\n  \"mensaje\": \"Cliente actualizado correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"clienteId\": \"C0001\",\n    \"nombre\": \"Jose Lema Modificado\",\n    \"genero\": \"M\",\n    \"edad\": 31,\n    \"identificacion\": \"1234567890\",\n    \"direccion\": \"Quito Av. Central y Bolívar\",\n    \"telefono\": \"099998877\",\n    \"estado\": false\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes",
+								"{{id}}"
+							]
+						},
+						"description": "### Descripción\n\nElimina físicamente un cliente del sistema, junto con todas sus cuentas y movimientos asociados.  \nAdemás, se publica un evento para notificar al microservicio de **Operaciones Bancarias** que debe eliminar toda la información relacionada con ese cliente.\n\n### Notas\n\n- La eliminación es **física**, no lógica.\n    \n- Si el cliente no existe, se devuelve un error **404**.\n    \n- Antes de eliminar, se publica un evento `CLIENTE_ELIMINADO` con el `clienteId`.\n    \n- El microservicio de **Operaciones Bancarias** escucha este evento y elimina todas las cuentas y movimientos vinculados al cliente.\n    \n- Esta acción es irreversible; toda la información del cliente y sus transacciones se pierde definitivamente.\n    \n\n### Parámetros\n\n- `id` (Long): Identificador interno del cliente a eliminar.\n    \n\n### Endpoint\n\n`DELETE {{host_clientes}}/api/gestion-clientes/clientes/{{id}}`"
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente por clienteId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/clientes/codigo/{{clienteId}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"clientes",
+								"codigo",
+								"{{clienteId}}"
+							]
+						},
+						"description": "### **Descripción**\n\nObtiene la información de un cliente utilizando su identificador público `clienteId`, el cual se genera automáticamente al momento de crear el cliente.\n\n### **Notas**\n\n- Este endpoint es útil cuando se desea consultar un cliente sin usar el `id` interno de base de datos.\n    \n- El `{{clienteId}}` se guarda automáticamente en el environment de Postman al crear el cliente.\n    \n- Puede utilizarse en integraciones donde solo se conozca el `clienteId`, por ejemplo, al obtener información relacionada con cuentas o reportes.\n    \n\n### **Endpoint**\n\n`GET {{host_clientes}}/api/gestion-clientes/clientes/clienteId/{{clienteId}}`\n\n### **Ejemplo URL**\n\n```\nhttp://localhost:8081/api/gestion-clientes/clientes/clienteId/C0001\n\n ```\n\n### **Ejemplo Respuesta**\n\n``` json\n{\n  \"id\": 1,\n  \"clienteId\": \"C0001\",\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"estado\": true\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "Contiene los endpoints relacionados con la gestión de clientes: creación, consulta, actualización y eliminación.  \nPermite mantener la información personal y de estado de los clientes del sistema."
+		},
+		{
+			"name": "Cuentas",
+			"item": [
+				{
+					"name": "Crear Cuenta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200/201\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"const json = pm.response.json() || {};",
+									"",
+									"// Extraer valores desde la respuesta",
+									"const numeroCuenta = json.numeroCuenta || json.data?.numeroCuenta;",
+									"const cuentaId = json.cuentaId || json.id || json.data?.cuentaId || json.data?.id;",
+									"",
+									"// Guardar variables en el environment",
+									"pm.environment.set(\"numeroCuenta\", numeroCuenta);",
+									"pm.environment.set(\"cuentaId\", cuentaId);",
+									"",
+									"// Mostrar en consola",
+									"console.log(\"cuentaId:\", cuentaId, \"numeroCuenta:\", numeroCuenta);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"585549\",\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoInicial\": 1000,\n  \"estado\": true,\n  \"clienteId\": \"{{clienteId}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/cuentas",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"cuentas"
+							]
+						},
+						"description": "### Descripción\n\nCrea una nueva cuenta bancaria asociada a un cliente existente.  \nEl sistema valida que el número de cuenta sea único y que el cliente exista antes de registrar la cuenta.\n\n### Notas\n\n- Se valida que el `numeroCuenta` no esté registrado previamente.\n    \n- Se consulta al microservicio de **Gestión de Clientes** para verificar la existencia del cliente mediante `clienteId`.\n    \n- Si el cliente no existe, se devuelve un error **404**.\n    \n- Si no se especifica `saldoInicial`, el sistema lo asigna automáticamente como **0.00**.\n    \n- La cuenta se crea sin registrar un movimiento inicial.\n    \n- Devuelve un código **201 Created** con la ubicación del recurso creado.\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/cuentas`\n\n### Campos Requeridos\n\n- `numeroCuenta` (String)\n    \n- `tipoCuenta` (String)\n    \n- `saldoInicial` (Decimal)\n    \n- `estado` (Boolean)\n    \n- `clienteId` (String)\n    \n\n### Campos Opcionales\n\n- `clienteNombre` (String)\n    \n- `fechaCreacion` (DateTime)\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/cuentas`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"585545\",\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoInicial\": 1000,\n  \"estado\": true,\n  \"clienteId\": \"{{clienteId}}\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Cuentas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/cuentas",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"cuentas"
+							]
+						},
+						"description": "## Descripción\n\nRetorna la lista completa de cuentas registrados."
+					},
+					"response": []
+				},
+				{
+					"name": "Cuenta por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/cuentas/{{cuentaId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"cuentas",
+								"{{cuentaId}}"
+							]
+						},
+						"description": "## Endpoint: Cuenta por ID\n\n### Descripción\n\nObtiene la información detallada de una cuenta bancaria específica mediante su identificador único `idCuenta`.\n\n### Notas\n\n- Permite consultar los datos completos de una cuenta registrada, incluyendo tipo, saldo y estado.\n    \n- El parámetro `{{idCuenta}}` se obtiene al crear una cuenta y se guarda en el environment de Postman.\n    \n- Este endpoint es útil para validar la existencia y estado actual de una cuenta antes de realizar operaciones o movimientos.\n    \n\n### Endpoint\n\n`GET {{host_operaciones}}/api/operaciones/cuentas/{{idCuenta}}`\n\n### Ejemplo URL\n\n[http://localhost:8082/api/operaciones/cuentas/1](http://localhost:8082/api/operaciones/cuentas/1)\n\n```\n### Ejemplo Respuesta\n```json\n{\n  \"id\": 1,\n  \"cuentaId\": \"CT0001\",\n  \"numeroCuenta\": \"585545\",\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoInicial\": 1000.00,\n  \"estado\": true,\n  \"clienteId\": \"C0001\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numeroCuenta\": \"{{numeroCuenta}}\",\n    \"clienteId\":\"{{clienteId}}\",\n    \"tipoCuenta\": \"AHORRO\",\n    \"saldoInicial\": 1000.00,\n    \"estado\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/cuentas/{{cuentaId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"cuentas",
+								"{{cuentaId}}"
+							]
+						},
+						"description": "## Endpoint: Actualizar Cuenta\n\n### Descripción\n\nActualiza los datos de una cuenta bancaria existente identificada por su `idCuenta`.  \nPermite modificar únicamente ciertos campos definidos como mutables, preservando la integridad de la información financiera.\n\n### Notas\n\n- El parámetro `{{idCuenta}}` corresponde al identificador único de la cuenta y se obtiene al momento de crearla.\n    \n- Los campos **`numeroCuenta`** y **`clienteId`** son **inmutables** y no pueden modificarse.\n    \n- Si la cuenta ya tiene movimientos registrados, **no se permite modificar el saldo inicial**.\n    \n- Solo se pueden actualizar los siguientes campos:\n    \n    - `tipoCuenta`\n        \n    - `estado`\n        \n    - `saldoInicial` (solo si no existen movimientos previos)\n        \n- Cuando el campo `estado` se establece en `false`, la cuenta queda inactiva y no podrá registrar nuevos movimientos.\n    \n- Si se intenta modificar un campo restringido o el saldo inicial de una cuenta con movimientos, el sistema devuelve un mensaje de error con código **400/409** según la configuración.\n    \n\n### Endpoint\n\n`PUT {{host_operaciones}}/api/operaciones/cuentas/{{idCuenta}}`\n\n### Ejemplo Body\n\n\\`\\`\\`json  \n{  \n\"numeroCuenta\": \"585545\",  \n\"tipoCuenta\": \"AHORRO\",  \n\"saldoInicial\": 1500.00,  \n\"estado\": true,  \n\"clienteId\": \"C0001\"  \n}"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar cuenta",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/cuentas/{{cuentaId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"cuentas",
+								"{{cuentaId}}"
+							]
+						},
+						"description": "## Endpoint: Eliminar Cuenta\n\n### Descripción\n\nElimina físicamente una cuenta bancaria específica identificada por su `idCuenta`, junto con todos los movimientos asociados a ella.\n\n### Notas\n\n- El parámetro `{{idCuenta}}` corresponde al identificador único de la cuenta y se obtiene al momento de crearla.\n    \n- Este proceso realiza una **eliminación física**, no lógica.\n    \n- Antes de eliminar la cuenta, el sistema:\n    \n    1. Verifica que la cuenta exista.\n        \n    2. Elimina todos los movimientos asociados (`deleteAllByCuentaId`).\n        \n    3. Luego elimina definitivamente la cuenta.\n        \n- Si la cuenta no existe, se lanza una excepción con el mensaje **\"No se encontró la cuenta con id X\"**.\n    \n- Esta acción es irreversible; toda la información relacionada con la cuenta y sus transacciones se pierde permanentemente.\n    \n- Se recomienda usar este endpoint únicamente en entornos de desarrollo o para limpieza de datos controlada.\n    \n\n### Endpoint\n\n`DELETE {{host_operaciones}}/api/operaciones/cuentas/{{idCuenta}}`\n\n### Ejemplo URL\n\n[http://localhost:8082/api/operaciones/cuentas/1](http://localhost:8082/api/operaciones/cuentas/1)  \nEjemplo Respuesta Exitosa\n\n[http://localhost:8082/api/operaciones/cuentas/1](http://localhost:8082/api/operaciones/cuentas/1)\n\n```\n### Ejemplo Respuesta Exitosa\n```json\n{\n  \"mensaje\": \"Cuenta y movimientos asociados eliminados correctamente\",\n  \"data\": {\n    \"idCuenta\": 1,\n    \"numeroCuenta\": \"585545\"\n  }\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "Incluye los endpoints para la administración de cuentas bancarias: creación, consulta, actualización y eliminación.  \nCada cuenta está asociada a un cliente y puede ser de tipo **Ahorro** o **Corriente**."
+		},
+		{
+			"name": "Movimientos",
+			"item": [
+				{
+					"name": "Registrar Movimiento",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200/201\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"let json;",
+									"",
+									"// Manejar errores si la respuesta no es JSON",
+									"try {",
+									"  json = pm.response.json();",
+									"} catch (e) {",
+									"  console.error(\"⚠️ Error al parsear JSON:\", e);",
+									"  json = {};",
+									"}",
+									"",
+									"// Extraer el ID del movimiento desde data.id",
+									"const movimientoId = json?.data?.id;",
+									"const numeroCuenta = json?.data?.numeroCuenta;",
+									"",
+									"// Mostrar los valores en la consola",
+									"console.log(\"➡️ movimientoId:\", movimientoId);",
+									"console.log(\"➡️ numeroCuenta:\", numeroCuenta);",
+									"",
+									"// Guardar las variables en el environment si existen",
+									"if (movimientoId !== undefined && movimientoId !== null) {",
+									"  pm.environment.set(\"movimientoId\", movimientoId);",
+									"  console.log(\"✅ movimientoId guardado en environment:\", movimientoId);",
+									"} else {",
+									"  console.warn(\"⚠️ No se encontró movimientoId en la respuesta.\");",
+									"}",
+									"",
+									"if (numeroCuenta) {",
+									"  pm.environment.set(\"numeroCuenta\", numeroCuenta);",
+									"  console.log(\"✅ numeroCuenta guardado:\", numeroCuenta);",
+									"}",
+									"",
+									"// Test para confirmar que el movimientoId fue capturado",
+									"pm.test(\"El movimientoId fue guardado correctamente\", function () {",
+									"  pm.expect(pm.environment.get(\"movimientoId\")).to.exist;",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"DEPOSITO\",\n  \"valor\": 100\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/movimientos",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"movimientos"
+							]
+						},
+						"description": "## Descripción\n\nRegistra un nuevo movimiento (depósito o retiro) en una cuenta bancaria existente.\n\n### Notas\n\n- Este endpoint afecta el saldo de la cuenta especificada por `numeroCuenta`.\n    \n- El campo `tipoMovimiento` puede ser **DEPOSITO** o **RETIRO**.\n    \n- El valor ingresado se suma o resta automáticamente del saldo actual según el tipo de movimiento.\n    \n- Usa el `numeroCuenta` obtenido previamente al crear la cuenta.\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/movimientos`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"DEPOSITO\",\n  \"valor\": 100.00\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Validar saldo insuficiente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe rechazar retiro con saldo insuficiente\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([400, 409]);",
+									"});",
+									"",
+									"pm.test(\"Mensaje de error indica saldo insuficiente\", function () {",
+									"  const body = pm.response.text();",
+									"  pm.expect(body.toLowerCase()).to.include.oneOf([\"saldo no disponible\", \"saldo insuficiente\"]);",
+									"});",
+									"",
+									"console.log(\"Resultado de validación de control de saldo:\", pm.response.text());",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"RETIRO\",\n  \"valor\": 999999\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/movimientos",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"movimientos"
+							]
+						},
+						"description": "## Descripción\n\nVerifica la regla de negocio que impide realizar un retiro si no hay saldo suficiente en la cuenta.\n\n### Notas\n\n- Usa el `numeroCuenta` generado previamente.\n    \n- Intenta retirar un valor mayor al saldo disponible.\n    \n- La API debe responder con un **HTTP 400 o 409**, y un mensaje indicando “Saldo no disponible” o “Saldo insuficiente”.\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/movimientos`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"RETIRO\",\n  \"valor\": 999999\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Movimientos por iD cuenta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/movimientos/cuenta/{{cuentaId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"movimientos",
+								"cuenta",
+								"{{cuentaId}}"
+							]
+						},
+						"description": "### Descripción\n\nObtiene la lista completa de movimientos asociados a una cuenta bancaria específica, ordenados de manera descendente por fecha (del más reciente al más antiguo).\n\n### Notas\n\n- El parámetro `{{cuentaId}}` identifica la cuenta cuyos movimientos se desean consultar.\n    \n- El sistema primero valida que la cuenta exista; si no se encuentra, se devuelve un error.\n    \n- Durante el proceso, se enriquece la información de la cuenta con el **nombre del cliente** asociado, consultando el microservicio de **Gestión de Clientes**.\n    \n- Si el cliente no existe o ocurre un error al consultarlo, se devuelve un texto descriptivo en el campo `clienteNombre`.\n    \n- La respuesta incluye todos los movimientos registrados, junto con su saldo resultante y los datos de la cuenta.\n    \n\n### Endpoint\n\n`GET {{host_operaciones}}/api/operaciones/movimientos/cuenta/{{cuentaId}}`\n\n### Ejemplo URL\n\nhttp://localhost:8082/api/operaciones/movimientos/cuenta/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar ultimo movimiento",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"numeroCuenta\": \"{{numeroCuenta}}\",\n    \"tipoMovimiento\": \"RETIRO\",\n    \"valor\": 60.00\n\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/movimientos/{{movimientoId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"movimientos",
+								"{{movimientoId}}"
+							]
+						},
+						"description": "## Endpoint: Actualizar Último Movimiento\n\n### Descripción\n\nActualiza la información del último (o único) movimiento registrado en una cuenta bancaria.  \nPermite corregir el tipo de movimiento o el valor, recalculando el saldo disponible de la cuenta de manera consistente.\n\n### Notas\n\n- El parámetro `{{movimientoId}}` identifica el movimiento que se desea actualizar.\n    \n- Si el cuerpo de la solicitud incluye un `id`, este debe coincidir con el `id` de la URL; de lo contrario, el sistema lanza un error.\n    \n- Solo se permite actualizar **el último o el único movimiento** de una cuenta. Si se intenta modificar un movimiento intermedio, se rechaza la solicitud.\n    \n- Antes de aplicar los cambios, el sistema:\n    \n    1. Verifica que el movimiento exista.\n        \n    2. Determina si es el último movimiento registrado para esa cuenta.\n        \n    3. Obtiene el saldo base (del movimiento anterior o del saldo inicial de la cuenta).\n        \n    4. Ajusta el signo del valor según el tipo de movimiento.\n        \n    5. Calcula el nuevo saldo resultante y valida que no sea negativo.\n        \n    6. Guarda los cambios actualizando el tipo, valor y fecha del movimiento.\n        \n- Si el saldo resultante es negativo, se rechaza la operación con el mensaje “Saldo no disponible”.\n    \n\n### Endpoint\n\n`PUT {{host_operaciones}}/api/operaciones/movimientos/{{movimientoId}}`"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar ultimo movimiento",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/movimientos/{{movimientoId}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"movimientos",
+								"{{movimientoId}}"
+							]
+						},
+						"description": "## Endpoint: Eliminar Último Movimiento\n\n### Descripción\n\nElimina físicamente un movimiento bancario específico identificado por su `id`, siempre que sea el último o el único movimiento registrado en la cuenta asociada.\n\n### Notas\n\n- El parámetro `{{movimientoId}}` identifica el movimiento que se desea eliminar.\n    \n- Antes de proceder, el sistema valida:\n    \n    1. Que el movimiento exista.\n        \n    2. Que la cuenta asociada tenga movimientos registrados.\n        \n    3. Que el movimiento a eliminar sea el último o el único de la cuenta.\n        \n- Si el movimiento no es el más reciente y existen otros posteriores, el sistema rechaza la operación.\n    \n- Esta eliminación es **física**: el movimiento se borra definitivamente del sistema.\n    \n- No se actualiza el saldo de la cuenta de manera retroactiva; el historial queda con el último saldo anterior al movimiento eliminado.\n    \n\n### Endpoint\n\n`DELETE {{host_operaciones}}/api/operaciones/movimientos/{{movimientoId}}`\n\n### Ejemplo URL"
+					},
+					"response": []
+				}
+			],
+			"description": "Agrupa los endpoints que registran, consultan, actualizan o eliminan movimientos bancarios.  \nPermite realizar depósitos, retiros y verificar saldos disponibles."
+		},
+		{
+			"name": "Reportes",
+			"item": [
+				{
+					"name": "Estado de Cuenta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estado de cuenta devuelto correctamente\", function () {",
+									"  pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"Respuesta contiene datos del cliente y cuentas\", function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json).to.have.property(\"cliente\");",
+									"  pm.expect(json).to.have.property(\"cuentas\");",
+									"  pm.expect(json.cuentas).to.be.an(\"array\").that.is.not.empty;",
+									"});",
+									"",
+									"console.log(\"📊 Estado de cuenta recibido:\", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/reportes?clienteId={{clienteId}}&fechaInicio=2025-10-01&fechaFin=2025-11-30",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"reportes"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-10-01"
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-11-30"
+								}
+							]
+						},
+						"description": "### Descripción\n\nGenera un reporte detallado del estado de cuenta de un cliente en un rango de fechas específico.  \nIncluye la información del cliente, las cuentas asociadas y los movimientos realizados dentro del período consultado.\n\n### Notas\n\n- Este endpoint consolida la información desde los microservicios de **Gestión de Clientes**, **Operaciones de Cuentas** y **Movimientos**.\n    \n- El reporte se genera a partir del `clienteId` y de las fechas `fechaInicio` y `fechaFin`.\n    \n- Antes de generar el reporte, el sistema valida:\n    \n    1. Que las fechas sean válidas (`fechaInicio` no puede ser posterior a `fechaFin`).\n        \n    2. Que existan cuentas registradas para el cliente.\n        \n- Para cada cuenta del cliente:\n    \n    - Se enriquece la información con el nombre del cliente.\n        \n    - Se obtienen todos los movimientos ocurridos dentro del rango de fechas.\n        \n    - Se calcula el saldo inicial, los movimientos y el estado actual de la cuenta.\n        \n- Si el cliente no tiene cuentas registradas, el sistema devuelve un error con el mensaje correspondiente.\n    \n- Este reporte es de solo lectura y no modifica ninguna entidad.\n    \n\n### Endpoint\n\n`GET {{host_operaciones}}/api/operaciones/reportes?clienteId={{clienteId}}&fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD`\n\n### Ejemplo URL\n\n`{{host_operaciones}}/api/operaciones/reportes?clienteId={{clienteId}}&fechaInicio=2025-10-01&fechaFin=2025-11-30`\n\n### Ejemplo Respuesta\n\n``` json\n{\n  \"cliente\": \"Jose Lema\",\n  \"cuentas\": [\n    {\n      \"numeroCuenta\": \"585545\",\n      \"tipoCuenta\": \"AHORRO\",\n      \"saldoInicial\": 1000.00,\n      \"estado\": true,\n      \"movimientos\": [\n        {\n          \"fecha\": \"2025-10-25T10:00:00\",\n          \"tipoMovimiento\": \"DEPOSITO\",\n          \"valor\": 200.00,\n          \"saldoDisponible\": 1200.00\n        }\n      ],\n      \"saldoDisponible\": 1200.00\n    }\n  ]\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "Reúne los endpoints que generan reportes consolidados de los clientes, como el **Estado de Cuenta**, mostrando movimientos y saldos dentro de un rango de fechas."
+		}
+	]
+}
