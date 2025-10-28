@@ -1,0 +1,475 @@
+{
+	"info": {
+		"_postman_id": "447dbce4-b4ce-4b9b-8aaa-d26f82ea9874",
+		"name": "Banco API – Evaluación",
+		"description": "Colección diseñada para probar el flujo completo de microservicios **Gestión de Clientes** y **Operaciones Bancarias**.\n\n## Flujo recomendado\n\nCrear Cliente → guarda `clienteId`  \nCrear Cuenta → usa `clienteId`  \nRegistrar Movimiento → usa `numeroCuenta`  \nEstado de Cuenta → consulta por `clienteId`\n\n## Environments\n\n**Local**\n\n- `host_clientes=http://localhost:8081`\n    \n- `host_operaciones=http://localhost:8082`\n    \n\n**Docker**\n\n- `host_clientes=http://gestion-clientes:8081`\n    \n- `host_operaciones=http://operaciones-bancarias:8082`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49548372",
+		"_collection_link": "https://paulbtrabajo10-2799578.postman.co/workspace/d50ae11f-c2e7-45eb-86fc-c8eb61ef2b1f/collection/49548372-447dbce4-b4ce-4b9b-8aaa-d26f82ea9874?action=share&source=collection_link&creator=49548372"
+	},
+	"item": [
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Crear Cliente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 201/200\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"const json = pm.response.json() || {};",
+									"const id = json.data?.id || json.id;                    ",
+									"const clienteId = json.data?.clienteId || json.clienteId;",
+									"",
+									"pm.test(\"La respuesta contiene id y clienteId\", function () {",
+									"  pm.expect(id).to.exist;",
+									"  pm.expect(clienteId).to.exist;",
+									"});",
+									"",
+									"// Guardar ambos valores en environment",
+									"pm.environment.set(\"id\", id);",
+									"pm.environment.set(\"clienteId\", clienteId);",
+									"",
+									"console.log(\"id guardado:\", id);",
+									"console.log(\"clienteId guardado:\", clienteId);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234564490\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"Abc123@12\",\n  \"estado\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_clientes}}/api/gestion-clientes/clientes",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"api",
+								"gestion-clientes",
+								"clientes"
+							]
+						},
+						"description": "## Descripción\n\nCrea un nuevo cliente en el sistema.\n\nNotas\n\n- Este endpoint registra un cliente con sus datos básicos (nombre, género, edad, etc.).\n    \n- Al ejecutar esta request, se guarda automáticamente el `clienteId` en el environment de Postman para usarlo en los siguientes pasos.\n    \n- Continúe con **POST Crear Cuenta** después de ejecutar este request.\n    \n- Endpoint\n    \n\n`POST {{host_clientes}}/api/gestion-clientes/clientes`\n\nEjemplo Body:\n\n``` json\n{\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"identificacion\": \"1234567890\",\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"Abc123@\",\n  \"estado\": true\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Clientes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/api/gestion-clientes/clientes",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"api",
+								"gestion-clientes",
+								"clientes"
+							]
+						},
+						"description": "## Descripción\n\nRetorna la lista completa de clientes registrados."
+					},
+					"response": []
+				},
+				{
+					"name": "Cliente por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/api/gestion-clientes/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"api",
+								"gestion-clientes",
+								"clientes",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar cliente",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"nombre\": \"Jose Lemar\",\n    \"genero\": \"Masculino\",\n    \"edad\": 30,\n    \"identificacion\": \"1234564490\",\n    \"direccion\": \"Quito sn y principal\",\n    \"telefono\": \"098254785\",\n    \"contrasena\": null,\n    \"estado\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_clientes}}/api/gestion-clientes/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"api",
+								"gestion-clientes",
+								"clientes",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_clientes}}/api/gestion-clientes/clientes/{{id}}",
+							"host": [
+								"{{host_clientes}}"
+							],
+							"path": [
+								"api",
+								"gestion-clientes",
+								"clientes",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cuentas",
+			"item": [
+				{
+					"name": "Crear Cuenta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200/201\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"",
+									"const json = pm.response.json() || {};",
+									"const numeroCuenta = json.numeroCuenta || json.data?.numeroCuenta;",
+									"const cuentaId = json.cuentaId || json.id || json.data?.cuentaId;",
+									"",
+									"pm.environment.set(\"numeroCuenta\", numeroCuenta);",
+									"pm.environment.set(\"cuentaId\", cuentaId);",
+									"",
+									"console.log(\"cuentaId:\", cuentaId, \" numeroCuenta:\", numeroCuenta);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"585546\",\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoInicial\": 1000,\n  \"estado\": true,\n  \"clienteId\": \"{{clienteId}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/cuentas",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"cuentas"
+							]
+						},
+						"description": "## Descripción\n\nCrea una nueva cuenta bancaria asociada a un cliente existente en el sistema.\n\n### Notas\n\n- Este endpoint permite registrar una cuenta del tipo **Ahorros** o **Corriente**.\n    \n- Es obligatorio que el `clienteId` ya exista; se obtiene automáticamente del paso **Crear Cliente**.\n    \n- Al ejecutar esta request, se guarda en el environment el `numeroCuenta` y el `cuentaId`, que serán usados en los siguientes pasos (por ejemplo, para registrar movimientos).\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/cuentas`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"585545\",\n  \"tipoCuenta\": \"AHORRO\",\n  \"saldoInicial\": 1000,\n  \"estado\": true,\n  \"clienteId\": \"{{clienteId}}\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Cuentas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/cuentas",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"cuentas"
+							]
+						},
+						"description": "## Descripción\n\nRetorna la lista completa de cuentas registrados."
+					},
+					"response": []
+				},
+				{
+					"name": "Cuenta por ID",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/cuentas/{{idCuenta}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"cuentas",
+								"{{idCuenta}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar cuenta",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/cuentas/{{idCuenta}}",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"cuentas",
+								"{{idCuenta}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Movimientos",
+			"item": [
+				{
+					"name": "Registrar Movimiento",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200/201\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"DEPOSITO\",\n  \"valor\": 123\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/movimientos",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"movimientos"
+							]
+						},
+						"description": "## Descripción\n\nRegistra un nuevo movimiento (depósito o retiro) en una cuenta bancaria existente.\n\n### Notas\n\n- Este endpoint afecta el saldo de la cuenta especificada por `numeroCuenta`.\n    \n- El campo `tipoMovimiento` puede ser **DEPOSITO** o **RETIRO**.\n    \n- El valor ingresado se suma o resta automáticamente del saldo actual según el tipo de movimiento.\n    \n- Usa el `numeroCuenta` obtenido previamente al crear la cuenta.\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/movimientos`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"DEPOSITO\",\n  \"valor\": 100.00\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Validar saldo insuficiente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe rechazar retiro con saldo insuficiente\", function () {",
+									"  pm.expect(pm.response.code).to.be.oneOf([400, 409]);",
+									"});",
+									"",
+									"pm.test(\"Mensaje de error indica saldo insuficiente\", function () {",
+									"  const body = pm.response.text();",
+									"  pm.expect(body.toLowerCase()).to.include.oneOf([\"saldo no disponible\", \"saldo insuficiente\"]);",
+									"});",
+									"",
+									"console.log(\"Resultado de validación de control de saldo:\", pm.response.text());",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"RETIRO\",\n  \"valor\": 999999\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/movimientos",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"movimientos"
+							]
+						},
+						"description": "## Descripción\n\nVerifica la regla de negocio que impide realizar un retiro si no hay saldo suficiente en la cuenta.\n\n### Notas\n\n- Usa el `numeroCuenta` generado previamente.\n    \n- Intenta retirar un valor mayor al saldo disponible.\n    \n- La API debe responder con un **HTTP 400 o 409**, y un mensaje indicando “Saldo no disponible” o “Saldo insuficiente”.\n    \n\n### Endpoint\n\n`POST {{host_operaciones}}/api/operaciones/movimientos`\n\n### Ejemplo Body\n\n``` json\n{\n  \"numeroCuenta\": \"{{numeroCuenta}}\",\n  \"tipoMovimiento\": \"RETIRO\",\n  \"valor\": 999999\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reportes",
+			"item": [
+				{
+					"name": "Estado de Cuenta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estado de cuenta devuelto correctamente\", function () {",
+									"  pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"",
+									"pm.test(\"Respuesta contiene datos del cliente y cuentas\", function () {",
+									"  const json = pm.response.json();",
+									"  pm.expect(json).to.have.property(\"cliente\");",
+									"  pm.expect(json).to.have.property(\"cuentas\");",
+									"  pm.expect(json.cuentas).to.be.an(\"array\").that.is.not.empty;",
+									"});",
+									"",
+									"console.log(\"📊 Estado de cuenta recibido:\", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host_operaciones}}/api/operaciones/reportes?clienteId={{clienteId}}&fechaInicio=2025-10-01&fechaFin=2025-11-30",
+							"host": [
+								"{{host_operaciones}}"
+							],
+							"path": [
+								"api",
+								"operaciones",
+								"reportes"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "{{clienteId}}"
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2025-10-01"
+								},
+								{
+									"key": "fechaFin",
+									"value": "2025-11-30"
+								}
+							]
+						},
+						"description": "## Descripción\n\nGenera el reporte del **estado de cuenta** de un cliente en un rango de fechas específico.  \nMuestra los movimientos realizados y el saldo final.\n\n### Notas\n\n- Usa el `clienteId` obtenido al crear el cliente.\n    \n- Permite filtrar los movimientos entre `fechaInicio` y `fechaFin`.\n    \n- Devuelve información consolidada: nombre del cliente, número de cuenta, tipo, saldo inicial, movimientos y saldo disponible.\n    \n\n### Endpoint\n\n`GET {{host_operaciones}}/api/operaciones/reportes?clienteId={{clienteId}}&fechaInicio=YYYY-MM-DD&fechaFin=YYYY-MM-DD`\n\n### Ejemplo URL\n\n`{{host_operaciones}}/api/operaciones/reportes?clienteId={{clienteId}}&fechaInicio=2025-10-01&fechaFin=2025-11-30`\n\n### Ejemplo Respuesta\n\n``` json\n{\n  \"cliente\": \"Jose Lema\",\n  \"cuentas\": [\n    {\n      \"numeroCuenta\": \"585545\",\n      \"tipoCuenta\": \"AHORRO\",\n      \"saldoInicial\": 1000.00,\n      \"estado\": true,\n      \"movimientos\": [\n        {\n          \"fecha\": \"2025-10-25T10:00:00\",\n          \"tipoMovimiento\": \"DEPOSITO\",\n          \"valor\": 200.00,\n          \"saldoDisponible\": 1200.00\n        }\n      ],\n      \"saldoDisponible\": 1200.00\n    }\n  ]\n}\n\n ```"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
