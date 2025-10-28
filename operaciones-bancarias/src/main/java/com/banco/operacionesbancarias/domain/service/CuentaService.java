@@ -23,6 +23,8 @@ public interface CuentaService {
 	void activarCuentasDeCliente(String clienteId);
 
 	void eliminarCuentasDeCliente(String clienteId);
+
+	void enriquecerConNombreCliente(Cuenta cuenta);
 	
 	
 }

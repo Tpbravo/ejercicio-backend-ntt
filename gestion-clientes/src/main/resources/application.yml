@@ -2,7 +2,7 @@ spring:
   application:
     name: gestion-clientes
   profiles:
-    active: local
+    active: docker
 
 server:
   port: 8081

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.banco.operacionesbancarias.domain.service.CuentaService;
-import com.banco.operacionesbancarias.infrastructure.persistence.CuentaRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ public class ClienteEventListener {
 	private final CuentaService cuentaService;
 
 	@Transactional
-	@KafkaListener(topics = "clientes-eventos", groupId = "operaciones-group")
+	@KafkaListener(topics = "clientes-eventos", groupId = "operaciones-group", containerFactory = "kafkaListenerContainerFactory")
 	public void consumirEvento(Map<String, Object> evento) {
 		String tipo = (String) evento.get("evento");
 		String clienteId = (String) evento.get("clienteId");

@@ -15,7 +15,6 @@ public class CuentaMapper {
 		cuenta.setSaldoInicial(dto.getSaldoInicial());
 		cuenta.setEstado(dto.getEstado());
 		cuenta.setClienteId(dto.getClienteId());
-		cuenta.setClienteNombre(dto.getClienteNombre());
 		cuenta.setFechaCreacion(dto.getFechaCreacion());
 		return cuenta;
 	}

@@ -14,7 +14,7 @@ spring:
         format_sql: true
 
   kafka:
-    bootstrap-servers: kafka_bank:9092
+    bootstrap-servers: kafka_bank:29092
     consumer:
       group-id: operaciones-group
       auto-offset-reset: latest
@@ -29,3 +29,14 @@ spring:
 services:
   gestion-clientes:
     url: http://gestion-clientes:8081/api/clientes
+
+server:
+  port: 8082
+  servlet:
+    context-path: /api/operaciones-bancarias
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

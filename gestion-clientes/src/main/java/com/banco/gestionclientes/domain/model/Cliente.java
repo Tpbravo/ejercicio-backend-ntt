@@ -45,6 +45,8 @@ public class Cliente extends Persona {
 
 	@PrePersist
 	public void prePersist() {
-		this.fechaCreacion = LocalDateTime.now();
+		if (this.fechaCreacion == null) {
+			this.fechaCreacion = LocalDateTime.now();
+		}
 	}
 }

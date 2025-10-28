@@ -24,3 +24,21 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+services:
+  gestion-clientes:
+    url: http://localhost:8081/api/gestion-clientes/clientes
+
+server:
+  port: 8082
+  servlet:
+    context-path: /api/operaciones
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

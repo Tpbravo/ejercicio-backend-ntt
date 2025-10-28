@@ -22,6 +22,8 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
 
 	Optional<Movimiento> findTopByCuentaIdOrderByFechaDesc(Long cuentaId);
 
+	Optional<Movimiento> findTopByCuentaIdAndIdNotOrderByFechaDesc(Long cuentaId, Long excludeId);
+
 	void deleteAllByCuentaId(Long cuentaId);
 
 	boolean existsByCuentaId(Long cuentaId);

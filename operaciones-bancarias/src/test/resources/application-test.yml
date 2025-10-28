@@ -4,10 +4,14 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
   jpa:
+    defer-datasource-initialization: false
     hibernate:
-      ddl-auto: create-drop  # crea las tablas al inicio y las borra al terminar
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
@@ -15,4 +19,4 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: warn
+    org.springframework.jdbc.datasource.init.ScriptUtils: debug

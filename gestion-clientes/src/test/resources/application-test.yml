@@ -1,0 +1,49 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  jpa:
+    defer-datasource-initialization: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  kafka:
+    # Usa el broker embebido de @EmbeddedKafka
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        acks: all
+        linger.ms: 0   # evita retardo en la publicación
+
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'   # permite deserializar cualquier clase del proyecto
+
+    listener:
+      missing-topics-fatal: false
+
+logging:
+  level:
+    root: info
+    org.springframework.jdbc.datasource.init.ScriptUtils: debug
+    org.apache.kafka: warn
+    org.springframework.kafka: info
+    com.banco: debug

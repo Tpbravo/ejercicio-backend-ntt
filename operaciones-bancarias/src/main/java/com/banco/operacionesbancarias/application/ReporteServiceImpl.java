@@ -11,6 +11,7 @@ import com.banco.operacionesbancarias.api.dto.ReporteDTO;
 import com.banco.operacionesbancarias.api.mapper.MovimientoMapper;
 import com.banco.operacionesbancarias.domain.model.Cuenta;
 import com.banco.operacionesbancarias.domain.model.Movimiento;
+import com.banco.operacionesbancarias.domain.service.CuentaService;
 import com.banco.operacionesbancarias.domain.service.ReporteService;
 import com.banco.operacionesbancarias.infrastructure.persistence.CuentaRepository;
 import com.banco.operacionesbancarias.infrastructure.persistence.MovimientoRepository;
@@ -23,6 +24,8 @@ public class ReporteServiceImpl implements ReporteService {
 
 	private final CuentaRepository cuentaRepository;
 	private final MovimientoRepository movimientoRepository;
+    private final CuentaService cuentaService; 
+
 
 	@Override
 	public List<ReporteDTO> generarReporte(String clienteId, LocalDate fechaInicio, LocalDate fechaFin) {
@@ -33,6 +36,8 @@ public class ReporteServiceImpl implements ReporteService {
 		}
 
 		return cuentas.stream().map((Cuenta cuenta) -> {
+            cuentaService.enriquecerConNombreCliente(cuenta);
+
 			// Recuperamos movimientos dentro del rango de fechas
 			List<Movimiento> movimientos = movimientoRepository.findByCuentaAndFechaBetweenOrderByFechaAsc(cuenta,
 					fechaInicio.atStartOfDay(), fechaFin.atTime(23, 59, 59));

@@ -51,7 +51,10 @@ public class MovimientoController {
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponse<MovimientoResponseDTO>> actualizarMovimiento(@PathVariable Long id,
 			@Validated @RequestBody MovimientoDTO dto) {
-
+	    // Validar que el id del DTO (si viene) coincida con el de la URL
+	    if (dto.getId() != null && !dto.getId().equals(id)) {
+	        throw new IllegalArgumentException("El identificador del movimiento en la URL no coincide con el del cuerpo de la solicitud");
+	    }
 		Movimiento actualizado = movimientoService.actualizarMovimiento(id, dto);
 		MovimientoResponseDTO response = MovimientoMapper.toDTO(actualizado);
 

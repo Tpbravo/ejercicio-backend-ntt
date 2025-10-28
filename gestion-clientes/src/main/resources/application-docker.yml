@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/gestion_clientes_db
+    url: jdbc:postgresql://postgres_bank:5432/gestion_clientes_db
     username: ms_clientes
     password: ms_clientes_pwd
     driver-class-name: org.postgresql.Driver
@@ -20,6 +20,12 @@ spring:
         format_sql: true
         jdbc:
           time_zone: America/Guayaquil
+
+  kafka:
+    bootstrap-servers: kafka_bank:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 server:
   port: 8081

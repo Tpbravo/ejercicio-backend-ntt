@@ -57,17 +57,25 @@ public class CuentaServiceImpl implements CuentaService {
 
 	@Override
 	public List<Cuenta> listar() {
-		return cuentaRepository.findAll();
+		List<Cuenta> cuentas = cuentaRepository.findAll();
+		cuentas.forEach(this::enriquecerConNombreCliente);
+		return cuentas;
 	}
 
 	@Override
 	public Optional<Cuenta> buscarPorId(Long id) {
-		return cuentaRepository.findById(id);
+		return cuentaRepository.findById(id).map(cuenta -> {
+			enriquecerConNombreCliente(cuenta);
+			return cuenta;
+		});
 	}
 
 	@Override
 	public Optional<Cuenta> buscarPorNumeroCuenta(String numeroCuenta) {
-		return cuentaRepository.findByNumeroCuenta(numeroCuenta);
+		return cuentaRepository.findByNumeroCuenta(numeroCuenta).map(cuenta -> {
+			enriquecerConNombreCliente(cuenta);
+			return cuenta;
+		});
 	}
 
 	@Override
@@ -139,5 +147,21 @@ public class CuentaServiceImpl implements CuentaService {
 		log.info("Eliminando {} cuentas del cliente {}", cuentas.size(), clienteId);
 
 		cuentas.forEach(cuenta -> eliminar(cuenta.getId()));
+	}
+	@Override
+	public void enriquecerConNombreCliente(Cuenta cuenta) {
+		try {
+			ClienteDTO cliente = clienteServiceClient.obtenerClientePorClienteId(cuenta.getClienteId()).block();
+
+			if (cliente != null) {
+				cuenta.setClienteNombre(cliente.getNombre());
+			} else {
+				cuenta.setClienteNombre("(Cliente no encontrado)");
+				log.warn("No se encontró cliente con ID {}", cuenta.getClienteId());
+			}
+		} catch (Exception e) {
+			cuenta.setClienteNombre("(Error al consultar cliente)");
+			log.error("Error obteniendo nombre para clienteId {}: {}", cuenta.getClienteId(), e.getMessage());
+		}
 	}
 }

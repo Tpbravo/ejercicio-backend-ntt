@@ -29,5 +29,6 @@ public class ClienteEventProducer {
 	private void enviarEvento(String tipo, String clienteId) {
 		Map<String, Object> evento = Map.of("evento", tipo, "clienteId", clienteId, "fecha", LocalDateTime.now());
 		kafkaTemplate.send("clientes-eventos", clienteId, evento);
+		kafkaTemplate.flush();
 	}
 }

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,8 @@ public class MovimientoServiceImpl implements MovimientoService {
 
 	private final MovimientoRepository movimientoRepository;
 	private final CuentaRepository cuentaRepository;
+	@Autowired
+	private CuentaServiceImpl cuentaService;
 
 	@Override
 	public Movimiento registrarMovimiento(MovimientoDTO dto) {
@@ -52,7 +55,7 @@ public class MovimientoServiceImpl implements MovimientoService {
 		// 3) calcular saldo resultante
 		BigDecimal nuevoSaldo = saldoBase.add(valor);
 		if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
-			throw new RuntimeException("Saldo no disponible para realizar la operación");
+			throw new RuntimeException("Saldo no disponible");
 		}
 
 		// 4) crear movimiento con el SALDO resultante (campo "saldo" del PDF)
@@ -68,7 +71,14 @@ public class MovimientoServiceImpl implements MovimientoService {
 	public List<Movimiento> listarPorCuenta(Long cuentaId) {
 		Cuenta cuenta = cuentaRepository.findById(cuentaId)
 				.orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
-		return movimientoRepository.findByCuentaOrderByFechaDesc(cuenta);
+
+		cuentaService.enriquecerConNombreCliente(cuenta);
+
+		List<Movimiento> movimientos = movimientoRepository.findByCuentaOrderByFechaDesc(cuenta);
+
+		movimientos.forEach(m -> m.setCuenta(cuenta));
+
+		return movimientos;
 	}
 
 	@Override
@@ -91,10 +101,33 @@ public class MovimientoServiceImpl implements MovimientoService {
 			throw new IllegalStateException("Solo se puede actualizar el último o el único movimiento de la cuenta");
 		}
 
-		// Actualizar campos válidos
+		// === Recalcular el nuevo saldo según el tipo de movimiento y valor
+		// actualizados ===
+		Cuenta cuenta = movimiento.getCuenta();
+
+		// 1) Obtener saldo base (último movimiento anterior o saldo inicial)
+		BigDecimal saldoBase = movimientoRepository.findTopByCuentaIdAndIdNotOrderByFechaDesc(cuentaId, id)
+				.map(Movimiento::getSaldo).orElse(cuenta.getSaldoInicial());
+
+		// 2) Normalizar signo según tipo
+		BigDecimal valor = dto.getValor();
+		if (dto.getTipoMovimiento() == TipoMovimientoEnum.RETIRO && valor.signum() > 0) {
+			valor = valor.negate();
+		} else if (dto.getTipoMovimiento() == TipoMovimientoEnum.DEPOSITO && valor.signum() < 0) {
+			valor = valor.abs();
+		}
+
+		// 3) Calcular nuevo saldo
+		BigDecimal nuevoSaldo = saldoBase.add(valor);
+		if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
+			throw new RuntimeException("Saldo no disponible");
+		}
+
+		// 4) Actualizar campos válidos
 		movimiento.setTipoMovimiento(dto.getTipoMovimiento());
-		movimiento.setValor(dto.getValor());
-		movimiento.setFecha(dto.getFecha());
+		movimiento.setValor(valor);
+		movimiento.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDateTime.now());
+		movimiento.setSaldo(nuevoSaldo);
 
 		return movimientoRepository.save(movimiento);
 	}

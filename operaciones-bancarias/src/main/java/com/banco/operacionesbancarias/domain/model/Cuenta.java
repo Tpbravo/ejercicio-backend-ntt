@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -58,21 +59,23 @@ public class Cuenta {
 	@Column(name = "cliente_id", nullable = false)
 	private String clienteId;
 
-	@NotBlank(message = "{clienteNombre.notblank}")
-	@Size(max = 100, message = "{clienteNombre.size}")
-	@Column(name = "cliente_nombre", nullable = false, length = 100)
-	private String clienteNombre;
-
 	@Column(name = "fecha_creacion", nullable = false, updatable = false)
 	private LocalDateTime fechaCreacion;
 
+	@Transient
+	private String clienteNombre;
+
 	@PrePersist
 	public void prePersist() {
-		this.fechaCreacion = LocalDateTime.now();
-		if (this.estado == null)
+		if (this.fechaCreacion == null) {
+			this.fechaCreacion = LocalDateTime.now();
+		}
+		if (this.estado == null) {
 			this.estado = true;
-		if (this.saldoInicial == null)
+		}
+		if (this.saldoInicial == null) {
 			this.saldoInicial = BigDecimal.ZERO;
+		}
 	}
 
 }
