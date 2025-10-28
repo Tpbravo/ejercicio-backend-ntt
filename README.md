@@ -23,7 +23,7 @@ Los servicios usan **bases de datos PostgreSQL separadas** y se orquestan a trav
 
 ---
 ---
-## Nota sobre Recursos (Docker Compose)
+# Nota sobre Recursos (Docker Compose)
 
 Los contenedores están configurados con límites de CPU y memoria elevados para optimizar los tiempos de arranque de Spring Boot y Kafka.
 
@@ -41,7 +41,7 @@ deploy:
 
 Estos valores garantizan compatibilidad con equipos de al menos 8 GB de RAM sin afectar la funcionalidad.
 ---
---
+---
 ## Validaciones en Endpoints
 
 Cada endpoint aplica **validaciones a nivel de DTO** usando **Jakarta Bean Validation**, asegurando la integridad de datos antes de llegar a la capa de dominio.
