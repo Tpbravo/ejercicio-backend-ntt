@@ -22,7 +22,26 @@ Ambos se comunican **asíncronamente** mediante **Apache Kafka** para la publica
 Los servicios usan **bases de datos PostgreSQL separadas** y se orquestan a través de **Docker Compose** junto al broker Kafka.
 
 ---
+---
+## Nota sobre Recursos (Docker Compose)
 
+Los contenedores están configurados con límites de CPU y memoria elevados para optimizar los tiempos de arranque de Spring Boot y Kafka.
+
+Para equipos con recursos limitados, puedes ajustar en `docker-compose.yml`:
+```yaml
+deploy:
+  resources:
+    limits:
+      cpus: "3.0"
+      memory: 4g
+    reservations:
+      cpus: "1.0"
+      memory: 1g
+```
+
+Estos valores garantizan compatibilidad con equipos de al menos 8 GB de RAM sin afectar la funcionalidad.
+---
+--
 ## Validaciones en Endpoints
 
 Cada endpoint aplica **validaciones a nivel de DTO** usando **Jakarta Bean Validation**, asegurando la integridad de datos antes de llegar a la capa de dominio.
