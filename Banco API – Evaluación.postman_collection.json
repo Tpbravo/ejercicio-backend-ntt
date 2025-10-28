@@ -5,7 +5,7 @@
 		"description": "Colección diseñada para probar el flujo completo de microservicios **Gestión de Clientes** y **Operaciones Bancarias**.\n\n## Flujo recomendado\n\nCrear Cliente → guarda `clienteId`  \nCrear Cuenta → usa `clienteId`  \nRegistrar Movimiento → usa `numeroCuenta`  \nEstado de Cuenta → consulta por `clienteId`\n\n## Environments\n\n**Local**\n\n- `host_clientes=http://localhost:8081`\n    \n- `host_operaciones=http://localhost:8082`\n    \n\n**Docker**\n\n- `host_clientes=http://gestion-clientes:8081`\n    \n- `host_operaciones=http://operaciones-bancarias:8082`",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "49548372",
-		"_collection_link": "https://paulbtrabajo10-2799578.postman.co/workspace/d50ae11f-c2e7-45eb-86fc-c8eb61ef2b1f/collection/49548372-447dbce4-b4ce-4b9b-8aaa-d26f82ea9874?action=share&source=collection_link&creator=49548372"
+		"_collection_link": "https://paulbtrabajo10-2799578.postman.co/workspace/lko's-Workspace~d50ae11f-c2e7-45eb-86fc-c8eb61ef2b1f/collection/49548372-447dbce4-b4ce-4b9b-8aaa-d26f82ea9874?action=share&source=collection_link&creator=49548372"
 	},
 	"item": [
 		{
